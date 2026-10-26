@@ -1,0 +1,88 @@
+/* motion.css — site v2 motion layer (owner 2026-10-20: «анимации более плавными и глубокими … современные 2026 анимации
+   для кнопок и табов и ховеры премиум»). Everything here sits behind `.js.motion-ok` and/or `(hover: hover) and (pointer: fine)`;
+   with reduced motion or the weak-device guard the page is static (styles.css «reduced motion» block). */
+:root { --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); --ease-spring-soft: cubic-bezier(0.34, 1.4, 0.64, 1); }
+
+/* ---------- reveal on scroll ---------- */
+.js.motion-ok .reveal {
+  opacity: 0; transform: translate3d(0, 40px, 0) scale(0.985); filter: blur(10px);
+  transition: opacity 0.9s var(--ease-out-expo) var(--rd, 0ms), transform 1.25s var(--ease-out-expo) var(--rd, 0ms), filter 0.9s var(--ease-out-expo) var(--rd, 0ms);
+}
+.js.motion-ok .reveal.is-in { opacity: 1; transform: none; filter: none; }
+/* headings rise out of their own line. The clip lives only in the keyframes: a target clipped to nothing in its resting
+   hidden state never intersects, so IntersectionObserver would never reveal it (seen in f1). */
+.js.motion-ok .reveal-line { transform: translate3d(0, 0.5em, 0); filter: blur(6px); }
+.js.motion-ok .reveal-line.is-in { animation: line-rise 1.15s var(--ease-out-expo) var(--rd, 0ms) both; }
+@keyframes line-rise {
+  from { opacity: 0; transform: translate3d(0, 0.55em, 0); clip-path: inset(-12% -4% 100% -4%); filter: blur(6px); }
+  to { opacity: 1; transform: none; clip-path: inset(-12% -4% -24% -4%); filter: none; }
+}
+/* images inside revealed cards settle from a slight zoom; hover zoom multiplies on top (--rs × --hs) */
+.work-plate img, .recent-preview img:first-child, .tile-art img {
+  transform: scale(calc(var(--rs, 1) * var(--hs, 1))); transition: transform 1.4s var(--ease-out-expo) !important; }
+.js.motion-ok .reveal:not(.is-in) .work-plate img, .js.motion-ok .reveal:not(.is-in) .recent-preview img:first-child { --rs: 1.14; }
+/* hero entrance: deeper, softer */
+.js.motion-ok [data-enter] { animation: enter2 1.1s var(--ease-out-expo) both; }
+@keyframes enter2 { from { opacity: 0; transform: translate3d(0, 26px, 0); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+.js.motion-ok .hero-text [data-enter]:nth-child(2) { animation-delay: 90ms; }
+.js.motion-ok .hero-text [data-enter]:nth-child(3) { animation-delay: 180ms; }
+.js.motion-ok .hero-text [data-enter]:nth-child(4) { animation-delay: 250ms; }
+.js.motion-ok .hero-text [data-enter]:nth-child(5) { animation-delay: 320ms; }
+
+/* ---------- premium hover on images: tilt towards the pointer, lift, glare, slow zoom (js/motion.js sets --rx/--ry/--px/--py) ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .js.motion-ok .tilt { transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--lift, 0px), 0);
+    transition: transform 0.7s var(--ease-out-expo), box-shadow 0.7s var(--ease-out-expo); will-change: transform; }
+  .js.motion-ok .tilt.is-hover { --lift: -6px; transition: transform 0.25s var(--ease-out-expo), box-shadow 0.7s var(--ease-out-expo); }
+  .js.motion-ok .plate.tilt.is-hover { box-shadow: 0 1px 0 var(--fx-white-70), 0 8px 18px -8px var(--fx-ink-14), 0 48px 80px -40px var(--fx-ink-50); }
+  .js.motion-ok .recent-preview.tilt.is-hover { box-shadow: 0 22px 40px -12px var(--fx-ink-30); }
+  .tilt::before { content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none; opacity: 0;
+    background: radial-gradient(60% 70% at calc(var(--px, 0.5) * 100%) calc(var(--py, 0.3) * 100%), rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 70%);
+    mix-blend-mode: soft-light; transition: opacity 0.6s var(--ease-out-expo); }
+  .tilt.is-hover::before { opacity: 1; }
+  .work-card:hover .work-plate img, .recent-item:hover .recent-preview img:first-child, .tile:hover .tile-art img { --hs: 1.06; }
+  /* the live site's own hover zooms (1.025 / 1.035) are replaced by the --hs scale above */
+  .work-card:hover .work-plate img, .recent-item:hover .recent-preview img:first-child { transform: scale(calc(var(--rs, 1) * var(--hs, 1))); }
+}
+
+/* ---------- buttons: magnetic, spotlight under the pointer, one light sweep, springy press ---------- */
+.btn, .dock-cta { position: relative; isolation: isolate; overflow: hidden;
+  transform: translate3d(var(--tx, 0px), calc(var(--ty, 0px) + var(--lift, 0px)), 0) scale(var(--bs, 1));
+  transition: transform 0.5s var(--ease-spring-soft), background-color 0.3s var(--ease), box-shadow 0.4s var(--ease-out-expo), color 0.3s var(--ease); }
+.btn-ink, .dock-cta { --spot: color-mix(in srgb, var(--text-on-inverse) 22%, transparent); --sheen: color-mix(in srgb, var(--text-on-inverse) 30%, transparent); }
+.btn-quiet { --spot: color-mix(in srgb, var(--text-heading) 7%, transparent); --sheen: var(--fx-white-55); }
+.btn::before, .dock-cta::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 50%), var(--spot), transparent 70%); transition: opacity 0.35s var(--ease); }
+.btn::after, .dock-cta::after { content: ""; position: absolute; inset: -1px; z-index: -1; pointer-events: none; transform: translateX(-130%);
+  background: linear-gradient(105deg, transparent 32%, var(--sheen) 50%, transparent 68%); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover, .dock-cta:hover { --lift: -1px; }
+  .btn:hover::before, .dock-cta:hover::before { opacity: 1; }
+  .js.motion-ok .btn:hover::after, .js.motion-ok .dock-cta:hover::after { transform: translateX(130%); transition: transform 0.95s var(--ease-out-expo); }
+  .btn-ink:hover { box-shadow: 0 10px 28px -12px var(--fx-lift-strong), 0 2px 6px -2px var(--fx-ink-14); }
+  .btn-quiet:hover { box-shadow: inset 0 0 0 1px var(--border-subtle), 0 10px 26px -12px var(--fx-lift); }
+  .btn .ic { transition: transform 0.45s var(--ease-spring-soft); }
+  .hero-actions .btn-ink:hover .ic { transform: translateY(2px); }
+}
+.btn:active, .dock-cta:active, .dock-link:active { --bs: 0.965; transition-duration: 0.12s; }
+.btn:active { transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--bs, 1)); }
+
+/* text links: no hover underline (owner 2026-10-20: «убери этот эффект полоски раздвигающейся везде где она есть на ховере») */
+.chips li, .pills li { transition: transform 0.4s var(--ease-spring-soft), background-color 0.3s var(--ease), box-shadow 0.3s var(--ease); }
+@media (hover: hover) and (pointer: fine) { .chips li:hover, .pills li:hover { transform: translateY(-2px); background: var(--bg-surface); } }
+
+/* ---------- dock tabs: a hover pill that glides between tabs, a springy active pill (owner: active a bit more contrast) ---------- */
+.dock-hover { position: absolute; z-index: 0; top: 6px; left: 0; height: 52px; width: 0; border-radius: var(--r-control); pointer-events: none;
+  background: color-mix(in srgb, var(--icon-primary) 5%, transparent); opacity: 0; transform: translateX(0);
+  transition: transform 0.5s var(--ease-spring-soft), width 0.5s var(--ease-spring-soft), opacity 0.25s var(--ease); }
+.dock-hover.is-on { opacity: 1; }
+.dock-indicator { transition: transform 0.55s var(--ease-spring-soft), width 0.55s var(--ease-spring-soft), opacity 0.2s var(--ease) !important; }
+.dock-link { transition: color 0.3s var(--ease), transform 0.35s var(--ease-spring-soft); }
+.dock-link:not(.dock-cta) { transform: scale(var(--bs, 1)); }
+
+/* ---------- header controls: a small springy hover ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .hc[data-state="open"] .hc-theme:hover, .hc[data-state="open"] .hc-music:hover, .hc[data-state="closed"] .hc-settings:hover { transform: scale(1.06); }
+  .hc[data-state="closed"] .hc-settings:hover svg { transform: rotate(60deg); }
+  .hc-settings svg { transition: opacity var(--t-fast) var(--ease), transform 0.6s var(--ease-spring-soft); }
+}

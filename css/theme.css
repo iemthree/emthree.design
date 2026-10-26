@@ -1,0 +1,54 @@
+/* theme.css — the theme switch (owner 2026-10-20: «переключение тем с красивой анимацией и морфингом, может даже волной перекраса»).
+   js/theme.js runs the switch inside a View Transition: the new theme is revealed by a liquid circle that grows from the
+   toggle (a polygon with a travelling wave on its edge, WAAPI on ::view-transition-new(root)), while a canvas draws a soft
+   light rim along that edge. Without View Transitions the colours cross-fade (html.theme-fade); with reduced motion, or
+   on a device the hero rig already marked as slow, the switch is instant. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-group(root) { animation-duration: 1.15s; }
+/* the header controls are NOT a separate group: the wave repaints them with the page (f3, 2026-10-20) */
+/* the rim: two colour layers (js/theme.js) — clipped to a strip by WAAPI, blurred here after the clip */
+.tw-rim { position: fixed; left: 0; top: 0; z-index: 2147483000; pointer-events: none; }   /* always transparent; size from js/theme.js */
+.tw-haze { view-transition-name: tw-haze; }
+.tw-core { view-transition-name: tw-core; }
+/* no large filters in the transition (owner recording 2026-10-20: the full-screen blurred haze made Chrome flash tiles of the old theme) */
+@property --tw-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
+::view-transition-group(tw-haze), ::view-transition-group(tw-core) { animation: none; }
+::view-transition-old(tw-haze), ::view-transition-old(tw-core) { display: none; }
+::view-transition-new(tw-haze), ::view-transition-new(tw-core) { animation: none; }
+/* haze: a 1/4-size layer scaled back up; Gaussian ring = the old 58 px band under a 26 px blur (stops every 20 px, /4) */
+::view-transition-image-pair(tw-haze) { transform: scale(4); transform-origin: 0 0; }
+::view-transition-new(tw-haze) { opacity: 0;
+  background: radial-gradient(circle at var(--tw-cx) var(--tw-cy),
+    transparent calc(var(--tw-r) - 25px),
+    rgb(var(--tw-rim-rgb) / 0.0105) calc(var(--tw-r) - 20px),
+    rgb(var(--tw-rim-rgb) / 0.049) calc(var(--tw-r) - 15px),
+    rgb(var(--tw-rim-rgb) / 0.139) calc(var(--tw-r) - 10px),
+    rgb(var(--tw-rim-rgb) / 0.254) calc(var(--tw-r) - 5px),
+    rgb(var(--tw-rim-rgb) / 0.309) var(--tw-r),
+    rgb(var(--tw-rim-rgb) / 0.254) calc(var(--tw-r) + 5px),
+    rgb(var(--tw-rim-rgb) / 0.139) calc(var(--tw-r) + 10px),
+    rgb(var(--tw-rim-rgb) / 0.049) calc(var(--tw-r) + 15px),
+    rgb(var(--tw-rim-rgb) / 0.0105) calc(var(--tw-r) + 20px),
+    transparent calc(var(--tw-r) + 25px)); }
+html.tw-wave-b::view-transition-new(tw-haze) {
+  background: linear-gradient(var(--tw-ang),
+    transparent calc(var(--tw-r) - 25px),
+    rgb(var(--tw-rim-rgb) / 0.0105) calc(var(--tw-r) - 20px),
+    rgb(var(--tw-rim-rgb) / 0.049) calc(var(--tw-r) - 15px),
+    rgb(var(--tw-rim-rgb) / 0.139) calc(var(--tw-r) - 10px),
+    rgb(var(--tw-rim-rgb) / 0.254) calc(var(--tw-r) - 5px),
+    rgb(var(--tw-rim-rgb) / 0.309) var(--tw-r),
+    rgb(var(--tw-rim-rgb) / 0.254) calc(var(--tw-r) + 5px),
+    rgb(var(--tw-rim-rgb) / 0.139) calc(var(--tw-r) + 10px),
+    rgb(var(--tw-rim-rgb) / 0.049) calc(var(--tw-r) + 15px),
+    rgb(var(--tw-rim-rgb) / 0.0105) calc(var(--tw-r) + 20px),
+    transparent calc(var(--tw-r) + 25px)); }
+/* core: one 12 px strip on a 1/2-size layer, blurred 3 px there (= 6 px) */
+::view-transition-image-pair(tw-core) { filter: blur(3px); transform: scale(2); transform-origin: 0 0; }
+::view-transition-new(tw-core) { opacity: 0; background: rgb(var(--tw-rim-rgb)); }
+
+/* fallback: no View Transitions API — a short colour cross-fade */
+html.theme-fade, html.theme-fade *, html.theme-fade *::before, html.theme-fade *::after {
+  transition: background-color 0.42s var(--ease), color 0.42s var(--ease), border-color 0.42s var(--ease), fill 0.42s var(--ease),
+    stroke 0.42s var(--ease), box-shadow 0.42s var(--ease) !important;
+}
