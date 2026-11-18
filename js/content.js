@@ -36,7 +36,7 @@ window.PF_CONTENT = {
   },
   "cta2": {
    "label": "Download CV",
-   "href": "assets/cv/Ihor_Zaitsev_CV_UIUX_Designer.pdf"
+   "href": "assets/cv/Ihor_Zaitsev_CV.pdf"
   },
   "scene": {
    "alt": "Looping illustration: a hiker in a cap and glasses and his small robot companion stand on a ledge above overgrown, flooded ruins."
@@ -650,8 +650,8 @@ window.PF_CONTENT = {
   ],
   "cv": {
    "label": "Download CV",
-   "href": "assets/cv/Ihor_Zaitsev_CV_UIUX_Designer.pdf",
-   "size": "PDF · 70 KB"
+   "href": "assets/cv/Ihor_Zaitsev_CV.pdf",
+   "size": "PDF · 129 KB"
   },
   "availability": "Based in Valencia (CET). Open to remote roles and relocation."
  },
